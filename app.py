@@ -47,6 +47,9 @@ def time(distance):
     completion, content = handleFile(timesPath + distance + ".txt")
     return jsonify({"distance": distances[distance], "time": content, "completed" : completion})
 
+@app.get("/")
+def running_dashboard():
+    return app.send_static_file("index.html")
 def handleFile(filePath):
     try: 
         file = open(filePath, "r+")

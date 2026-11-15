@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f3f4ee">
+<title>Czasy biegowe</title>
+<style>
+:root{font-family:Inter,system-ui,sans-serif;color:#17221a;background:#f3f4ee;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0}
+main{max-width:1000px;margin:auto;padding:clamp(28px,7vw,76px) clamp(18px,5vw,44px)}
+header{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+h1{font-size:clamp(38px,7vw,68px);letter-spacing:-.065em;line-height:1;margin:0}
+button{font:inherit;font-size:.875rem;font-weight:650;background:#e4ebdc;color:#233524;border:1px solid #cbd8c4;border-radius:100px;padding:10px 17px;cursor:pointer}
+button:hover{background:#d8e4cf}
+button:disabled{opacity:.65;cursor:wait}
+button:focus-visible{outline:2px solid #27573a;outline-offset:3px}
+section{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+article{background:#fff;border:1px solid #dde3d8;border-radius:22px;padding:clamp(18px,3vw,28px);min-height:184px}
+.card-header{display:flex;align-items:start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h2{font-size:1.125rem;margin:0;letter-spacing:-.025em}
+.distance{display:block;font-size:.875rem;color:#5b665c;margin-top:4px}
+.distance:empty{display:none}
+.badge{border-radius:100px;background:#f0f1ee;color:#4e584f;padding:5px 10px;font-size:.77rem;font-weight:650}
+[data-state=done] .badge{background:#e2f3e2;color:#245433}
+[data-state=error] .badge{background:#faebe3;color:#873f21}
+.result{margin:22px 0 0;font-size:clamp(32px,5vw,49px);letter-spacing:-.045em;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+article:not([data-state=done]) .result{color:#687469}
+.notice{font-size:.875rem;color:#5b665c;margin:16px 0 0}
+.notice:empty{margin:0}
+@media(max-width:580px){section{grid-template-columns:1fr}article{min-height:148px}.result{margin-top:17px}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Czasy biegowe</h1>
+    <button id="refresh" type="button">Odśwież wyniki</button>
+  </header>
+  <section aria-label="Wyniki według dystansu"></section>
+  <p class="notice" role="status"></p>
+</main>
+<template id="card">
+  <article>
+    <div class="card-header">
+      <div><h2></h2><span class="distance"></span></div>
+      <span class="badge"></span>
+    </div>
+    <p class="result">—</p>
+  </article>
+</template>
+<script>
+const distances = [
+  { id: 5, name: "5 km" },
+  { id: 10, name: "10 km" },
+  { id: 21, name: "Półmaraton", detail: "21,0975 km" },
+  { id: 42, name: "Maraton", detail: "42,195 km" },
+];
+
+const cards = document.querySelector("section");
+const template = document.querySelector("#card");
+const refresh = document.querySelector("#refresh");
+const notice = document.querySelector(".notice");
+
+for (const distance of distances) {
+  const card = template.content.firstElementChild.cloneNode(true);
+  card.querySelector("h2").textContent = distance.name;
+  card.querySelector(".distance").textContent = distance.detail ?? "";
+  cards.append(card);
+  distance.card = card;
+}
+
+function showResult(card, state, label, time = "—") {
+  card.dataset.state = state;
+  card.querySelector(".badge").textContent = label;
+  card.querySelector(".result").textContent = time;
+}
+
+async function loadDistance({id, card}) {
+  showResult(card, "loading", "Wczytywanie…");
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 6000);
+  try {
+    const response = await fetch("/api/run/" + id, {
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+
+    const result = await response.json();
+    if (result?.completed === false) {
+      showResult(card, "incomplete", "Nieukończony");
+      return true;
+    }
+    if (result?.completed !== true || typeof result.time !== "string" ||
+        !/^[0-9]{2,}:[0-5][0-9]:[0-5][0-9]$/.test(result.time.trim())) {
+      throw new Error("Nieprawidłowa odpowiedź API");
+    }
+    showResult(card, "done", "Ukończony", result.time.trim());
+    return true;
+  } catch {
+    showResult(card, "error", "Brak danych");
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function loadResults() {
+  refresh.disabled = true;
+  cards.setAttribute("aria-busy", "true");
+  notice.textContent = "Pobieranie wyników…";
+  const results = await Promise.all(distances.map(loadDistance));
+  cards.setAttribute("aria-busy", "false");
+  refresh.disabled = false;
+  const loaded = results.filter(Boolean).length;
+  notice.textContent = loaded === results.length
+    ? ""
+    : loaded === 0
+      ? "Nie udało się pobrać wyników. Sprawdź, czy API działa, i odśwież widok."
+      : "Część wyników jest niedostępna. Możesz spróbować ponownie.";
+}
+
+refresh.addEventListener("click", loadResults);
+loadResults();
+</script>
+</body>
+</html>

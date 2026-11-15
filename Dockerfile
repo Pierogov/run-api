@@ -6,6 +6,7 @@ RUN pip install --no-cache-dir "Flask>=3.1,<4" gunicorn
 
 COPY app.py .
 COPY times/ ./times/
+COPY static/ ./static/
 
 VOLUME ["/app/times"]
 EXPOSE 5000
