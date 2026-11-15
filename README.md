@@ -6,8 +6,10 @@
 <p>/api/run/{distance} - endpoint used to read data</p>
 <p>/api/run/update/{distance}?time=hh:mm:ss - endpoint used to write new time to file</p>
 <h2>Deployment using docker</h2>
+<p>Just paste these commands and everything should be running. Default app port is <b>5000</b>.</p>
 
 ```
 git clone https://github.com/Pierogov/run-api.git
+cd run-api/
 docker compose up -d
 ```
