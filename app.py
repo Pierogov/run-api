@@ -50,6 +50,11 @@ def time(distance):
 @app.get("/")
 def running_dashboard():
     return app.send_static_file("index.html")
+
+@app.get("/update")
+def running_update():
+    return app.send_static_file("update.html")
+
 def handleFile(filePath):
     try: 
         file = open(filePath, "r+")
