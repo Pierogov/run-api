@@ -3,11 +3,10 @@ services:
     container_name: run-api
     build: .
     ports:
-      - "127.0.0.1:5000:5000"
+      - "0.0.0.0:5000:5000"
     volumes:
       - times:/app/times
 
 volumes:
   times:
     name: run-api-times
-    external: true
