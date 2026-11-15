@@ -12,10 +12,12 @@ body{margin:0}
 main{max-width:1000px;margin:auto;padding:clamp(28px,7vw,76px) clamp(18px,5vw,44px)}
 header{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:28px}
 h1{font-size:clamp(38px,7vw,68px);letter-spacing:-.065em;line-height:1;margin:0}
-button{font:inherit;font-size:.875rem;font-weight:650;background:#e4ebdc;color:#233524;border:1px solid #cbd8c4;border-radius:100px;padding:10px 17px;cursor:pointer}
-button:hover{background:#d8e4cf}
+button,.action-link{font:inherit;font-size:.875rem;font-weight:650;background:#e4ebdc;color:#233524;border:1px solid #cbd8c4;border-radius:100px;padding:10px 17px;cursor:pointer}
+button:hover,.action-link:hover{background:#d8e4cf}
 button:disabled{opacity:.65;cursor:wait}
-button:focus-visible{outline:2px solid #27573a;outline-offset:3px}
+button:focus-visible,.action-link:focus-visible{outline:2px solid #27573a;outline-offset:3px}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.action-link{text-decoration:none}
 section{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 article{background:#fff;border:1px solid #dde3d8;border-radius:22px;padding:clamp(18px,3vw,28px);min-height:184px}
 .card-header{display:flex;align-items:start;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -36,7 +38,10 @@ article:not([data-state=done]) .result{color:#687469}
 <main>
   <header>
     <h1>Czasy biegowe</h1>
-    <button id="refresh" type="button">Odśwież wyniki</button>
+    <div class="actions">
+      <button id="refresh" type="button">Odśwież wyniki</button>
+      <a class="action-link" href="/update">Nowy czas</a>
+    </div>
   </header>
   <section aria-label="Wyniki według dystansu"></section>
   <p class="notice" role="status"></p>
