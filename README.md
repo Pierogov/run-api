@@ -6,6 +6,7 @@
 <p>/api/run/{distance} - endpoint used to read data</p>
 <p>/api/run/update/{distance}?time=hh:mm:ss - endpoint used to write new time to file</p>
 <h2>Deployment using docker</h2>
+
 ```
 git clone https://github.com/Pierogov/run-api.git
 docker compose up -d
