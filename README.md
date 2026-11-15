@@ -1,4 +1,4 @@
-<h1>Run-api</h1>
+<h1>RUN-API</h1>
 <p><i>Simple Flask Api used to store and return your PRs for most popular running distances</i></p>
 <h2>Using App</h2>
 API is also included with basic panel to check times in graphical form (<i>/</i> endpoint) and graphical interface to update times (<i>/update</i> endpoint). For now graphical interfaces are made only in polish, but feel free to change it to your language.<br>Base URL for main panel:
