@@ -2,3 +2,5 @@
 !Dockerfile
 !app.py
 !times/
+!static/
+!static/
